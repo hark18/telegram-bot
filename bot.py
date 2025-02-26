@@ -13,7 +13,11 @@ app = Flask(__name__)
 # Webhook URL (Replace with your actual Render service URL)
 WEBHOOK_URL = "https://your-render-service.onrender.com"
 
-# Set webhook
+@app.route('/')
+def home():
+    return "Bot is running!"
+
+# Webhook route
 @app.route('/webhook', methods=['POST'])
 def webhook():
     """Handle incoming Telegram messages via webhook"""
@@ -27,7 +31,7 @@ def webhook():
 def send_welcome(message):
     bot.send_message(message.chat.id, "Hello! I am your Telegram bot, running on Render.")
 
-# Echo function (Repeats messages)
+# Echo function (Avoids reply-to errors)
 @bot.message_handler(func=lambda message: True)
 def echo_message(message):
     try:
@@ -35,12 +39,12 @@ def echo_message(message):
     except telebot.apihelper.ApiTelegramException:
         bot.send_message(message.chat.id, "Sorry, I couldn't reply!")
 
-# Flask route to keep Render service alive
-@app.route('/')
-def home():
-    return "Bot is running!"
-
-if __name__ == "__main__":
+# Webhook Setup
+@app.before_first_request
+def setup_webhook():
     bot.remove_webhook()
-    bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")  # Set webhook
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")
+
+# Gunicorn does NOT need app.run()
+if __name__ == "__main__":
+    setup_webhook()
