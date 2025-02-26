@@ -1,5 +1,6 @@
 import os
 import telebot
+import requests  # <-- Added missing import
 from flask import Flask, request
 
 # Load Telegram bot token from environment variables
@@ -44,6 +45,19 @@ with app.app_context():
     bot.remove_webhook()
     bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")
 
+# Function to send messages to Telegram
+def post_to_telegram(bot_token, chat_id, message):
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    params = {
+        "chat_id": chat_id,
+        "text": message
+    }
+    response = requests.post(url, params=params)
+    return response.json()
+
+# Example Usage
+telegram_response = post_to_telegram("your_bot_token", "your_chat_id", "Hello, Telegram!")
+
 # Gunicorn does NOT need app.run()
 if __name__ == "__main__":
-    pass  # Gunicorn will run this
+    pass  # <-- Keeping this for Gunicorn deployment
