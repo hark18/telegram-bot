@@ -3,28 +3,23 @@ import telebot
 from flask import Flask, request
 
 # Load Telegram bot token from environment variables
-TOKEN = os.getenv("7310806246:AAFtzq-rFjCkTKS0hnhZvs7z4u2TJDNcaDM")
+TOKEN = "7310806246:AAFtzq-rFjCkTKS0hnhZvs7z4u2TJDNcaDM"
 if not TOKEN:
     raise ValueError("Missing TELEGRAM_BOT_TOKEN environment variable")
 
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
-# Webhook URL (Replace with your Render service URL)
+# Webhook URL (Replace with your actual Render service URL)
 WEBHOOK_URL = "https://your-render-service.onrender.com"
-
-@app.route('/')
-def home():
-    return "Bot is running!"
 
 # Set webhook
 @app.route('/webhook', methods=['POST'])
 def webhook():
     """Handle incoming Telegram messages via webhook"""
-    if request.method == "POST":
-        update = request.get_json()
-        if update:
-            bot.process_new_updates([telebot.types.Update.de_json(update)])
+    update = request.get_json()
+    if update:
+        bot.process_new_updates([telebot.types.Update.de_json(update)])
     return "OK", 200
 
 # Start command
@@ -32,7 +27,7 @@ def webhook():
 def send_welcome(message):
     bot.send_message(message.chat.id, "Hello! I am your Telegram bot, running on Render.")
 
-# Echo function (Avoids reply-to errors)
+# Echo function (Repeats messages)
 @bot.message_handler(func=lambda message: True)
 def echo_message(message):
     try:
@@ -40,7 +35,12 @@ def echo_message(message):
     except telebot.apihelper.ApiTelegramException:
         bot.send_message(message.chat.id, "Sorry, I couldn't reply!")
 
+# Flask route to keep Render service alive
+@app.route('/')
+def home():
+    return "Bot is running!"
+
 if __name__ == "__main__":
     bot.remove_webhook()
-    bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")  # Set Render webhook
+    bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")  # Set webhook
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
