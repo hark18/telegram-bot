@@ -1,3 +1,4 @@
-gunicorn
-pyTelegramBotAPI
-Flask
+echo -e "gunicorn\npyTelegramBotAPI\nrequests\nFlask" > requirements.txt
+git add requirements.txt
+git commit -m "Added requirements.txt"
+git push origin main
