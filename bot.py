@@ -40,11 +40,10 @@ def echo_message(message):
         bot.send_message(message.chat.id, "Sorry, I couldn't reply!")
 
 # Webhook Setup
-@app.before_first_request
-def setup_webhook():
+with app.app_context():
     bot.remove_webhook()
     bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")
 
 # Gunicorn does NOT need app.run()
 if __name__ == "__main__":
-    setup_webhook()
+    pass  # Gunicorn will run this
