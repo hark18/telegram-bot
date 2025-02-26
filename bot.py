@@ -56,7 +56,7 @@ def post_to_telegram(bot_token, chat_id, message):
     return response.json()
 
 # Example Usage
-telegram_response = post_to_telegram("your_bot_token", "your_chat_id", "Hello, Telegram!")
+telegram_response = post_to_telegram("7310806246:AAFtzq-rFjCkTKS0hnhZvs7z4u2TJDNcaDM", "@Tmmwke1", "Hello, Telegram!")
 
 # Gunicorn does NOT need app.run()
 if __name__ == "__main__":
